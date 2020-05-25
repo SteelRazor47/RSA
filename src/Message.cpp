@@ -1,6 +1,7 @@
 #include "Message.hpp"
 #include <numeric>
 #include <string>
+#include <iostream>
 
 Message::Message(const std::string_view msg) : firstMessage(msg) {}
 
@@ -18,6 +19,7 @@ void Message::encrypt(const PublicKey &key)
         if( remaining > 0){
             messages.push_back(mpz_class{encodeString(firstMessage.substr(firstMessage.size() - remaining, remaining).data())});
         }
+        std::cout << '\n' << firstMessage << std::endl;
     }
     for (auto &&message : messages)
     {

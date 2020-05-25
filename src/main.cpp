@@ -15,6 +15,7 @@ int main()
 
     std::cout << "Enter Alice's message ";
     std::string msg;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, msg);
 
     auto isSanitized = [](const std::string &s) { return std::all_of(s.begin(), s.end(), [](auto &&ch) { return isascii(ch); }); };
@@ -70,7 +71,6 @@ Pair init()
         return {RSA(2048), RSA(2048)};
     default:
         std::cout << "Please enter Y or N\n";
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         return init();
     }
 }
