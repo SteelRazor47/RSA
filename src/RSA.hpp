@@ -3,19 +3,18 @@
 #include <gmpxx.h>
 #include "Message.hpp"
 
-
 class RSA
 {
 public:
-    explicit RSA(const int size = 2048);
+    explicit RSA(const int size);
+    explicit RSA(const mpz_class &p, const mpz_class &q);
 
-    Message encrypt(const PublicKey& key, Message message) const;
+    Message encrypt(const PublicKey &key, Message message) const;
     Message decrypt(Message message) const;
 
     PublicKey getPublicKey() const { return m_Keys.first; }
 
-private:
-    const int m_Size;
+public:
     gmp_randclass m_State;
-    const std::pair<PublicKey, PrivateKey> m_Keys;
+    std::pair<PublicKey, PrivateKey> m_Keys;
 };

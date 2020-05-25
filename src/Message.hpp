@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gmpxx.h>
+#include <string_view>
 #include "Utility.hpp"
 
 struct PublicKey
@@ -10,7 +11,7 @@ public:
     PublicKey(const mpz_class &n_, const mpz_class &e_) : n(n_), e(e_) {}
     friend class Message;
 
-private:
+public:
     const mpz_class n;
     const mpz_class e;
 };
@@ -23,7 +24,7 @@ public:
         : p(p_), q(q_), n(p_ * q_), d(d_), dp(d_ % (p_ - 1)), dq(d_ % (q_ - 1)), qinv(inverse(q_, p_)) {}
     friend class Message;
 
-private:
+public:
     const mpz_class n;
     const mpz_class d;
     const mpz_class p;
@@ -36,13 +37,14 @@ private:
 class Message
 {
 public:
-    explicit Message(const mpz_class &num);
+    explicit Message(const std::string_view msg);
 
     void encrypt(const PublicKey &key);
     void decrypt(const PrivateKey &key);
 
-    std::string getMessage() const;
+    std::string getMessage(bool decode = false) const;
 
 private:
-    mpz_class message;
+    std::vector<mpz_class> messages;
+    const std::string firstMessage;
 };

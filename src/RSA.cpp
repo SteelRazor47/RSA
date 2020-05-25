@@ -1,24 +1,36 @@
 #include "RSA.hpp"
 #include "Utility.hpp"
 #include <chrono>
-#include <iostream>
 
 RSA::RSA(const int s)
-    : m_Size(s), m_State(gmp_randinit_mt),
+    : m_State(gmp_randinit_mt),
       m_Keys([&]() {
-          time_t time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+          auto time = std::chrono::high_resolution_clock::now().time_since_epoch().count();
           m_State.seed(time);
 
-          mpz_class p = randomBigPrime(m_Size / 2, m_State);
-          mpz_class q = randomBigPrime(m_Size / 2, m_State);
+          mpz_class p = randomBigPrime(s / 2, m_State);
+          mpz_class q = randomBigPrime(s / 2, m_State);
           mpz_class n = p * q;
-          mpz_class lambda = lcm(p - 1, q - 1);
+          mpz_class lambda = lcm(p - 1,  q - 1);
           mpz_class e = m_State.get_z_range(lambda - 1) + 1;
           while (gcd(e, lambda) != 1)
               e = m_State.get_z_range(lambda - 1) + 1;
           mpz_class d = inverse(e, lambda);
-          std::cout << "e: " << e << "\n\n";
-          std::cout << "d: " << d << "\n\n";
+
+          return std::pair<PublicKey, PrivateKey>{{n, e}, {p, q, d}};
+      }())
+{
+}
+
+RSA::RSA(const mpz_class &p, const mpz_class &q)
+    : m_State(gmp_randinit_mt),
+      m_Keys([&]() {
+          mpz_class n = p * q;
+          mpz_class lambda = lcm(p - 1,  q - 1);
+          mpz_class e = m_State.get_z_range(lambda - 1) + 1;
+          while (gcd(e, lambda) != 1)
+              e = m_State.get_z_range(lambda - 1) + 1;
+          mpz_class d = inverse(e, lambda);
 
           return std::pair<PublicKey, PrivateKey>{{n, e}, {p, q, d}};
       }())
